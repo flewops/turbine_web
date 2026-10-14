@@ -1,3 +1,5 @@
+import type { MouseEvent } from "react";
+import { useNavigate } from "react-router-dom";
 import type { DocsBlock } from "../lib/parseDocsMarkdown";
 import { renderInline } from "../lib/parseDocsMarkdown";
 
@@ -13,9 +15,18 @@ export default function DocsContent({ blocks, inverted = false }: DocsContentPro
   const codeBg = inverted ? "bg-secondary/10" : "bg-primary/5";
   const tableHead = inverted ? "bg-secondary/10" : "bg-primary/5";
   const tableStripe = inverted ? "bg-secondary/5" : "bg-primary/[0.03]";
+  const navigate = useNavigate();
+
+  // Route in-site links (e.g. to another app's docs) without a full reload.
+  const onClick = (e: MouseEvent<HTMLDivElement>) => {
+    const link = (e.target as Element).closest("a[data-internal]");
+    if (!link || e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+    e.preventDefault();
+    navigate(link.getAttribute("href") ?? "/");
+  };
 
   return (
-    <div className={`docs-prose space-y-5 text-base leading-relaxed sm:text-[17px] ${muted}`}>
+    <div onClick={onClick} className={`docs-prose space-y-5 text-base leading-relaxed sm:text-[17px] ${muted}`}>
       {blocks.map((block, idx) => {
         switch (block.type) {
           case "p":

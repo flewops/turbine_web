@@ -61,7 +61,7 @@ export default function AppDetailPage() {
         </header>
 
         <section className="mx-auto max-w-[1600px] px-4 py-16 sm:px-6 lg:px-8">
-          <p className="text-sm font-bold uppercase tracking-[0.14em] text-primary/75">Capabilities</p>
+          <p className="text-sm font-bold font-display uppercase tracking-[0.1em] text-primary/75">Capabilities</p>
           <h2 className="mt-3 font-display text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">What {app.name} delivers</h2>
           <div className="mt-10 grid border-2 border-primary sm:grid-cols-2">
             {app.features.map((feature, i) => (
@@ -82,7 +82,7 @@ export default function AppDetailPage() {
         {related.length > 0 && (
           <section className="border-t-8 border-primary bg-primary text-secondary">
             <div className="mx-auto max-w-[1600px] px-4 py-14 sm:px-6 lg:px-8">
-              <p className="text-sm font-bold uppercase tracking-[0.14em] text-secondary/75">Related</p>
+              <p className="text-sm font-bold font-display uppercase tracking-[0.1em] text-secondary/75">Related</p>
               <h2 className="mt-3 font-display text-4xl font-extrabold tracking-tight sm:text-5xl">More {category?.name} apps</h2>
               <div className="mt-8 grid border-2 border-secondary/30 sm:grid-cols-3">
                 {related.map((r, i) => (

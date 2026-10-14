@@ -7,7 +7,7 @@ export default function CTASection() {
     <section className="border-t-8 border-primary bg-primary text-secondary">
       <div className="relative mx-auto max-w-[1600px] overflow-hidden px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
         <div className="pointer-events-none absolute inset-0 grid-lines-inv" />
-        <p className="relative text-sm font-bold uppercase tracking-[0.14em] text-secondary/75">
+        <p className="relative text-sm font-bold font-display uppercase tracking-[0.1em] text-secondary/75">
           Next step
         </p>
         <h2 className="relative mt-4 max-w-5xl font-display text-5xl font-extrabold leading-[0.92] tracking-tight sm:text-6xl lg:text-8xl">

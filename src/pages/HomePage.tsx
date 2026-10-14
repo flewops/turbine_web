@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowUpRight, ArrowRight } from "lucide-react";
+import { ArrowUpRight, ArrowRight, Headset, ShieldCheck, TrendingUp } from "lucide-react";
 import SEO from "../components/SEO";
 import BentoCard from "../components/BentoCard";
 import SectionHeading from "../components/SectionHeading";
@@ -9,6 +9,8 @@ import { company } from "../data/company";
 import { categories, apps } from "../data/apps";
 import { features, homepageHighlights } from "../data/features";
 import { industries } from "../data/industries";
+
+const hostingIcons = [Headset, ShieldCheck, TrendingUp];
 
 export default function HomePage() {
   const featuredApps = apps.filter((a) =>
@@ -31,7 +33,7 @@ export default function HomePage() {
       <section className="relative overflow-hidden border-b-8 border-primary bg-secondary">
         <div className="pointer-events-none absolute inset-0 grid-lines" />
         <div className="relative mx-auto max-w-[1600px] px-4 pt-8 sm:px-6 sm:pt-10 lg:px-8 lg:pt-14">
-          <div className="inline-block border-2 border-primary bg-primary px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.12em] text-secondary sm:px-4 sm:py-2 sm:text-sm sm:tracking-[0.14em]">
+          <div className="inline-block border-2 border-primary bg-primary px-3 py-1.5 text-[11px] font-bold font-display uppercase tracking-[0.1em] text-secondary sm:px-4 sm:py-2 sm:text-sm sm:tracking-[0.14em]">
             Business Operating System
           </div>
 
@@ -100,61 +102,40 @@ export default function HomePage() {
         <div className="animate-marquee flex w-max gap-0 whitespace-nowrap">
           {[...marqueeItems, ...marqueeItems].map((item, i) => (
             <span key={`${item}-${i}`} className="flex items-center">
-              <span className="px-8 text-sm font-bold uppercase tracking-[0.18em]">{item}</span>
+              <span className="px-8 text-sm font-bold font-display uppercase tracking-[0.1em]">{item}</span>
               <span className="text-secondary/80">/</span>
             </span>
           ))}
         </div>
       </div>
 
-      {/* ASYMMETRIC BENTO */}
+      {/* PLATFORM — 2×2 highlight cards */}
       <section className="border-b-8 border-primary">
         <div className="mx-auto max-w-[1600px] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
           <SectionHeading
             eyebrow="Platform"
             title="Not another tool. A system."
             description="Turbine replaces scattered software with a modular operating system. Start lean. Expand without friction."
-            large
           />
 
-          <div className="mt-12 grid border-2 border-primary md:grid-cols-6">
-            <Link
-              to={homepageHighlights[0].href}
-              className="group relative col-span-full border-b-2 border-primary bg-primary p-8 text-secondary md:col-span-4 md:row-span-2 md:border-b-0 md:border-r-2 md:p-10"
-            >
-              <div className="flex items-start justify-between">
-                <span className="text-sm font-bold opacity-85">01 — Core</span>
-                <ArrowUpRight className="h-7 w-7 opacity-85 transition group-hover:opacity-100" />
-              </div>
-              <h3 className="mt-16 font-display text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
-                {homepageHighlights[0].title}
-              </h3>
-              <p className="mt-4 max-w-md text-lg text-secondary/80">
-                {homepageHighlights[0].description}
-              </p>
-              <div className="mt-8 border-2 border-secondary/30">
-                <img
-                  src="/images/dashboard-preview.jpg"
-                  alt=""
-                  className="aspect-[16/8] w-full object-cover grayscale opacity-80 transition group-hover:opacity-100"
-                />
-              </div>
-            </Link>
-
-            {homepageHighlights.slice(1).map((item, i) => (
-              <div
+          <div className="mt-12 grid gap-6 md:grid-cols-2">
+            {homepageHighlights.map((item) => (
+              <Link
                 key={item.title}
-                className={`col-span-full md:col-span-2 ${i < 2 ? "border-b-2 border-primary" : ""}`}
+                to={item.href}
+                className="group flex flex-col gap-4 border-2 border-primary p-6 transition-colors hover:bg-primary hover:text-secondary sm:flex-row sm:gap-5 sm:p-8"
               >
-                <BentoCard
-                  title={item.title}
-                  description={item.description}
-                  href={item.href}
-                  variant={i === 1 ? "ink" : "paper"}
-                  index={`0${i + 2}`}
-                  className="min-h-[220px] border-0"
-                />
-              </div>
+                <span className="inline-flex h-fit w-fit shrink-0 border-2 border-current p-3">
+                  <Icon name={item.icon} className="h-6 w-6" />
+                </span>
+                <div className="flex-1">
+                  <h3 className="font-display text-2xl font-extrabold tracking-tight">{item.title}</h3>
+                  <p className="mt-2 text-base leading-relaxed opacity-75">{item.description}</p>
+                  <span className="mt-4 inline-flex items-center gap-2 text-sm font-bold">
+                    Explore <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
+                  </span>
+                </div>
+              </Link>
             ))}
           </div>
         </div>
@@ -260,87 +241,77 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* HOSTING SPLIT */}
+      {/* HOSTING — centered heading, three benefit cards, contact button */}
       <section className="border-b-8 border-primary">
-        <div className="grid lg:grid-cols-2">
-          <div className="border-b-2 border-primary bg-primary px-4 py-16 text-secondary sm:px-10 lg:border-b-0 lg:border-r-2 lg:px-16 lg:py-24">
-            <p className="text-sm font-bold uppercase tracking-[0.14em] text-secondary/75">Hosting</p>
-            <h2 className="mt-4 font-display text-4xl font-extrabold tracking-tight sm:text-6xl lg:text-7xl">
-              {company.hosting.title}
-            </h2>
-            <p className="mt-5 max-w-md text-lg text-secondary/80">{company.hosting.description}</p>
-            <div className="mt-12 space-y-0 divide-y-2 divide-secondary/20 border-t-2 border-secondary/20">
-              {company.hosting.benefits.map((b, i) => (
-                <div key={b.title} className="py-6">
-                  <span className="text-xs font-bold text-secondary/80">
-                    {String(i + 1).padStart(2, "0")}
+        <div className="mx-auto max-w-[1600px] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+          <SectionHeading
+            eyebrow="Hosting"
+            title={company.hosting.title}
+            description={company.hosting.description}
+            align="center"
+          />
+
+          <div className="mx-auto mt-12 grid max-w-6xl gap-6 md:grid-cols-3">
+            {company.hosting.benefits.map((b, i) => {
+              const BenefitIcon = hostingIcons[i % hostingIcons.length];
+              return (
+                <div key={b.title} className="border-2 border-primary p-8">
+                  <span className="inline-flex border-2 border-primary p-3">
+                    <BenefitIcon className="h-6 w-6" />
                   </span>
-                  <h3 className="mt-1 font-display text-xl font-extrabold">{b.title}</h3>
-                  <p className="mt-1 text-sm text-secondary/80">{b.description}</p>
+                  <h3 className="mt-6 font-display text-xl font-extrabold sm:text-2xl">{b.title}</h3>
+                  <p className="mt-2 text-base leading-relaxed text-primary/75">{b.description}</p>
                 </div>
-              ))}
-            </div>
+              );
+            })}
           </div>
-          <div className="relative min-h-[420px] bg-primary">
-            <img
-              src="/images/apps-overview.jpg"
-              alt="Integrated apps"
-              className="absolute inset-0 h-full w-full object-cover grayscale"
-            />
-            <div className="absolute inset-0 bg-primary/50" />
-            <div className="absolute bottom-0 left-0 right-0 border-t-2 border-secondary/30 bg-primary p-8 text-secondary">
-              <p className="text-sm font-bold uppercase tracking-[0.14em] text-secondary/75">
-                Infrastructure
-              </p>
-              <p className="mt-2 font-display text-3xl font-extrabold">
-                Packaged. Hosted. Owned end to end.
-              </p>
-            </div>
+
+          <div className="mt-12 text-center">
+            <Link
+              to="/contact"
+              className="inline-flex items-center gap-2 border-2 border-primary bg-primary px-6 py-3.5 text-sm font-bold text-secondary transition-colors hover:bg-secondary hover:text-primary"
+            >
+              Talk to our team <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* INDUSTRIES */}
-      <section className="border-b-8 border-primary">
+      {/* INDUSTRIES — even grid of photo cards, on dark */}
+      <section className="border-b-8 border-primary bg-primary text-secondary">
         <div className="mx-auto max-w-[1600px] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
           <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
             <SectionHeading
               eyebrow="Industries"
               title="Configured for how you work"
               description="From manufacturing floors to retail counters — Turbine adapts to your industry patterns."
-              large
+              light
             />
             <Link
               to="/industries"
-              className="inline-flex shrink-0 items-center gap-2 border-2 border-primary px-5 py-3 text-sm font-bold"
+              className="inline-flex shrink-0 items-center gap-2 border-2 border-secondary px-5 py-3 text-sm font-bold transition-colors hover:bg-secondary hover:text-primary"
             >
               All industries <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
 
-          <div className="mt-12 grid border-2 border-primary md:grid-cols-3">
-            {industries.slice(0, 6).map((ind, i) => (
-              <Link
-                key={ind.id}
-                to={`/industries/${ind.id}`}
-                className={`group relative overflow-hidden border-primary ${
-                  i === 0 || i === 5 ? "md:col-span-2" : ""
-                } ${i > 0 ? "border-t-2 md:border-t-0" : ""} ${
-                  i === 1 || i === 2 || i === 4 ? "md:border-l-2" : ""
-                } ${i >= 3 ? "md:border-t-2" : ""}`}
-              >
-                <div className="aspect-[16/10] overflow-hidden bg-primary">
+          <div className="mt-12 grid gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+            {industries.slice(0, 6).map((ind) => (
+              <Link key={ind.id} to={`/industries/${ind.id}`} className="group block">
+                <div className="aspect-[4/3] overflow-hidden border-2 border-secondary/20 bg-primary">
                   <img
                     src={ind.image}
                     alt={ind.name}
-                    className="h-full w-full object-cover grayscale transition duration-500 group-hover:scale-105"
+                    loading="lazy"
+                    className="h-full w-full object-cover grayscale transition duration-500 group-hover:scale-105 group-hover:grayscale-0"
                   />
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/40 to-transparent" />
-                <div className="absolute inset-x-0 bottom-0 p-6 text-secondary sm:p-8">
-                  <p className="text-xs font-bold opacity-85">{String(i + 1).padStart(2, "0")}</p>
-                  <h3 className="mt-1 font-display text-2xl font-extrabold sm:text-3xl">{ind.name}</h3>
-                  <p className="mt-1 text-sm text-secondary/85">{ind.tagline}</p>
+                <div className="mt-4 flex items-start justify-between gap-4">
+                  <div>
+                    <h3 className="font-display text-xl font-extrabold tracking-tight sm:text-2xl">{ind.name}</h3>
+                    <p className="mt-1 text-sm text-secondary/70 sm:text-base">{ind.tagline}</p>
+                  </div>
+                  <ArrowUpRight className="mt-1 h-5 w-5 shrink-0 text-secondary/40 transition group-hover:text-secondary" />
                 </div>
               </Link>
             ))}
@@ -350,40 +321,40 @@ export default function HomePage() {
 
       {/* PRICING TEASER */}
       <section className="border-b-8 border-primary">
-        <div className="mx-auto max-w-[1600px] px-4 py-16 sm:px-6 sm:py-24 lg:px-8">
+        <div className="mx-auto max-w-[1600px] px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
           <div className="grid border-2 border-primary lg:grid-cols-2">
-            <div className="border-b-2 border-primary p-8 sm:p-12 lg:border-b-0 lg:border-r-2 lg:p-16">
-              <p className="text-sm font-bold uppercase tracking-[0.14em] text-primary/75">Pricing</p>
-              <h2 className="mt-4 font-display text-4xl font-extrabold tracking-tight sm:text-6xl lg:text-7xl">
+            <div className="border-b-2 border-primary p-6 sm:p-8 lg:border-b-0 lg:border-r-2 lg:p-10">
+              <p className="text-sm font-bold font-display uppercase tracking-[0.1em] text-primary/75">Pricing</p>
+              <h2 className="mt-3 font-display text-3xl font-extrabold tracking-tight sm:text-5xl">
                 One-time setup.
                 <br />
                 Clear monthly.
               </h2>
-              <p className="mt-5 max-w-md text-lg text-primary/80">
+              <p className="mt-4 max-w-md text-base text-primary/80 sm:text-lg">
                 No labyrinth of SKUs. Implement once, then scale users as your team grows — hosting and support included.
               </p>
               <Link
                 to="/pricing"
-                className="mt-8 inline-flex items-center gap-2 border-2 border-primary bg-primary px-5 py-3 text-sm font-bold text-secondary"
+                className="mt-6 inline-flex items-center gap-2 border-2 border-primary bg-primary px-5 py-3 text-sm font-bold text-secondary transition-colors hover:bg-secondary hover:text-primary"
               >
                 See pricing details <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
             <div className="grid sm:grid-cols-2">
-              <div className="flex flex-col justify-between border-b-2 border-primary p-8 sm:border-b-0 sm:border-r-2 sm:p-10">
-                <p className="text-xs font-bold uppercase tracking-[0.12em] text-primary/80">
+              <div className="flex flex-col justify-center border-b-2 border-primary p-6 sm:border-b-0 sm:border-r-2 sm:p-8">
+                <p className="text-xs font-bold font-display uppercase tracking-[0.1em] text-primary/80">
                   Implementation
                 </p>
-                <div className="mt-16">
+                <div className="mt-3">
                   <p className="font-display text-4xl font-extrabold">One-time</p>
                   <p className="mt-2 text-sm text-primary/75">Scoped to your apps and processes</p>
                 </div>
               </div>
-              <div className="flex flex-col justify-between bg-primary p-8 text-secondary sm:p-10">
-                <p className="text-xs font-bold uppercase tracking-[0.12em] text-secondary/75">
+              <div className="flex flex-col justify-center bg-primary p-6 text-secondary sm:p-8">
+                <p className="text-xs font-bold font-display uppercase tracking-[0.1em] text-secondary/75">
                   Subscription
                 </p>
-                <div className="mt-16">
+                <div className="mt-3">
                   <p className="font-display text-4xl font-extrabold">Per user / mo</p>
                   <p className="mt-2 text-sm text-secondary/75">Hosting, updates & support included</p>
                 </div>

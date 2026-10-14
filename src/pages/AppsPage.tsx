@@ -112,7 +112,7 @@ export default function AppsPage() {
       <section className="mx-auto max-w-[1600px] px-4 pb-16 pt-10 sm:px-6 sm:pb-20 sm:pt-12 lg:px-8">
         {activeCategory && (
           <div className="mb-10 border-b-2 border-primary pb-8">
-            <p className="text-sm font-bold uppercase tracking-[0.14em] text-primary/75">
+            <p className="text-sm font-bold font-display uppercase tracking-[0.1em] text-primary/75">
               Category
             </p>
             <h2 className="mt-2 font-display text-3xl font-extrabold sm:text-4xl lg:text-5xl">

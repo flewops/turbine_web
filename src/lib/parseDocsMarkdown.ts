@@ -62,17 +62,29 @@ function uniqueId(base: string, used: Set<string>): string {
   return id;
 }
 
-/** Minimal inline markdown: **bold**, *italic*, `code`, [links](url) */
+/** Only allow safe link targets; anything else (e.g. javascript:) becomes inert. */
+function safeHref(href: string): string {
+  return /^(https?:|mailto:|tel:|\/|#)/i.test(href) ? href : "#";
+}
+
+/**
+ * Minimal inline markdown: **bold**, *italic*, `code`, [links](url).
+ * Site-relative links (starting with "/") are marked data-internal so the
+ * renderer can route them without a full page load.
+ */
 export function renderInline(text: string): string {
   let html = text
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;");
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
 
-  html = html.replace(
-    /\[([^\]]+)\]\(([^)]+)\)/g,
-    '<a href="$2" class="docs-link" target="_blank" rel="noopener noreferrer">$1</a>'
-  );
+  html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, label: string, href: string) => {
+    const url = safeHref(href);
+    return url.startsWith("/")
+      ? `<a href="${url}" class="docs-link" data-internal>${label}</a>`
+      : `<a href="${url}" class="docs-link" target="_blank" rel="noopener noreferrer">${label}</a>`;
+  });
   html = html.replace(/`([^`]+)`/g, "<code>$1</code>");
   html = html.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
   // italic: single * not part of **
@@ -270,7 +282,20 @@ function parseBlocks(lines: string[]): DocsBlock[] {
  * paragraphs, lists, GFM tables, images `![alt](src)`, code fences,
  * blockquotes, horizontal rules, #### headings.
  */
-export function parseDocsMarkdown(markdown: string): ParsedDocs {
+export interface ParseDocsOptions {
+  /** Rewrites link and image targets, e.g. to resolve paths relative to the file. */
+  resolveUrl?: (url: string, kind: "link" | "image") => string;
+}
+
+export function parseDocsMarkdown(markdown: string, options: ParseDocsOptions = {}): ParsedDocs {
+  const { resolveUrl } = options;
+  if (resolveUrl) {
+    markdown = markdown
+      .replace(/(!?)\[([^\]]*)\]\(([^)\s]+)/g, (_, bang: string, label: string, url: string) =>
+        `${bang}[${label}](${resolveUrl(url, bang ? "image" : "link")}`
+      )
+      .replace(/(<img\s[^>]*src=["'])([^"']+)/gi, (_, prefix: string, url: string) => prefix + resolveUrl(url, "image"));
+  }
   const lines = markdown.replace(/\r\n/g, "\n").split("\n");
   const usedIds = new Set<string>();
 
