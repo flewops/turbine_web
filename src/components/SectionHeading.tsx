@@ -19,7 +19,7 @@ export default function SectionHeading({
     <div className={`max-w-5xl ${align === "center" ? "mx-auto text-center" : ""}`}>
       {eyebrow && (
         <p
-          className={`mb-4 inline-flex items-center gap-2 border-2 px-3 py-1.5 text-xs font-bold uppercase tracking-[0.16em] sm:text-sm ${
+          className={`mb-4 inline-flex items-center gap-2 border-2 px-3 py-1.5 text-xs font-bold font-display uppercase tracking-[0.1em] sm:text-sm ${
             light
               ? "border-secondary/40 text-secondary/80"
               : "border-primary text-primary"

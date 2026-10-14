@@ -65,7 +65,7 @@ export default function PricingPage() {
         </div>
 
         <div className="mt-8 border-2 border-primary p-8">
-          <p className="text-sm font-bold uppercase tracking-[0.14em] text-primary/75">Included always</p>
+          <p className="text-sm font-bold font-display uppercase tracking-[0.1em] text-primary/75">Included always</p>
           <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {pricing.includes.map((item) => (
               <div key={item} className="flex items-center gap-2.5 text-sm font-medium">

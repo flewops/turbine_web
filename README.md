@@ -1,73 +1,24 @@
-# React + TypeScript + Vite
+# Turbine
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Marketing site for [Turbine](https://turbine.flewops.com), a business operating system. Built with React 19, Vite, Tailwind CSS 4 and React Router.
 
-Currently, two official plugins are available:
+## Development
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```sh
+npm install
+npm run dev      # local dev server
+npm run build    # type-check and build to dist/
+npm run lint
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Content
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- Apps, industries, pricing and company copy live in `src/data/`.
+- The Resources page reads docs from the public GitHub repo set in `src/data/docsSource.ts` (`flewops/turbine-docs`, `main`). Layout: `versions.json` at the root (newest version first, with the app ids documented in each), one folder per version holding `index.md` (overview) and `<app-id>.md` per app. Visitors must pick a version (latest by default); the app is optional. Set `VITE_DOCS_BASE_URL` to read from elsewhere, e.g. a local folder server.
+- Page titles, descriptions and canonical URLs are set per page with `src/components/SEO.tsx`.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## SEO
+
+- `dist/sitemap.xml` is generated on every build from the routes in `vite.config.ts` plus every app and industry in `src/data/`, so new entries are included automatically. Add any new top-level page to `staticRoutes` there.
+- `public/robots.txt` points crawlers at the sitemap.
+- `vercel.json` serves `index.html` for client-side routes so deep links like `/apps/crm` load directly.

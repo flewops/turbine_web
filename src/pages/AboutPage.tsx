@@ -19,7 +19,7 @@ export default function AboutPage() {
       <section className="mx-auto max-w-[1600px] px-4 py-16 sm:px-6 lg:px-8">
         <div className="grid gap-14 lg:grid-cols-2">
           <div>
-            <p className="text-sm font-bold uppercase tracking-[0.14em] text-primary/75">Origin</p>
+            <p className="text-sm font-bold font-display uppercase tracking-[0.1em] text-primary/75">Origin</p>
             <h2 className="mt-3 font-display text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">Why we built Turbine</h2>
             <div className="mt-6 space-y-4 text-base leading-relaxed text-primary/80">
               <p>Most companies don&apos;t fail because they lack ambition — they struggle because their tools don&apos;t talk to each other.</p>

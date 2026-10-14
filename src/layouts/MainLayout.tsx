@@ -2,9 +2,11 @@ import { Outlet, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
+import { useUiSounds } from "../hooks/useUiSounds";
 
 export default function MainLayout() {
   const { pathname, search } = useLocation();
+  useUiSounds();
 
   // Scroll to top on route or query changes (e.g. /apps?category=finance)
   useEffect(() => {

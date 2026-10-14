@@ -1,315 +1,267 @@
-import { useEffect, useMemo, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { useEffect, type ReactNode } from "react";
+import { Link, useSearchParams } from "react-router-dom";
+import { ArrowUpRight } from "lucide-react";
 import SEO from "../components/SEO";
 import SectionHeading from "../components/SectionHeading";
 import CTASection from "../components/CTASection";
-import DocsContent from "../components/DocsContent";
-import { useDocs } from "../hooks/useDocs";
+import DocsViewer from "../components/DocsViewer";
+import Icon from "../components/IconMap";
+import { useDocs, useDocsIndex } from "../hooks/useDocs";
+import { getAppById } from "../data/apps";
+import { DOCS_REPO_URL, docsRepo, type DocsVersion } from "../data/docsSource";
 
-/** Documentation is loaded from /public/docs.md — edit that file to update this page. */
+const appName = (id: string) =>
+  getAppById(id)?.name ?? id.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+
+const versionLabel = (v: DocsVersion) => v.label ?? v.id;
+
+/**
+ * Documentation is read from the GitHub docs repo (see data/docsSource.ts).
+ * A release version is always selected (latest by default); picking an app is
+ * optional — without one, the version's overview (index.md) is shown.
+ * Both live in the URL: /resources?version=v2.0&app=crm
+ */
 export default function ResourcesPage() {
-  const { docs, loading, error, reload } = useDocs("/docs.md");
-  const location = useLocation();
-  const [activeId, setActiveId] = useState<string>("");
+  const [params, setParams] = useSearchParams();
+  const index = useDocsIndex();
+  const versions = index.data?.versions ?? [];
 
-  const sections = useMemo(() => docs?.sections ?? [], [docs]);
+  const versionParam = params.get("version");
+  const appParam = params.get("app");
+  const version = versions.find((v) => v.id === versionParam) ?? versions[0];
+  const appAvailable = !!version && !!appParam && version.apps.includes(appParam);
+  const docPath = version && (!appParam || appAvailable) ? `${version.id}/${appAvailable ? appParam : "index"}.md` : null;
+  const doc = useDocs(docPath);
 
+  // Version is mandatory: put the default (latest) into the URL so links are explicit.
   useEffect(() => {
-    if (location.hash) {
-      const id = location.hash.replace("#", "");
-      requestAnimationFrame(() => {
-        setActiveId(id);
-        document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
-    } else if (sections[0]) {
-      const firstId = sections[0].id;
-      requestAnimationFrame(() => setActiveId(firstId));
+    if (version && versionParam !== version.id) {
+      const next = new URLSearchParams(params);
+      next.set("version", version.id);
+      setParams(next, { replace: true });
     }
-  }, [location.hash, sections]);
+  }, [version, versionParam, params, setParams]);
 
-  // Track active section while scrolling — prefer the section nearest the top of the viewport
-  useEffect(() => {
-    if (!sections.length) return;
-
-    const onScroll = () => {
-      const headerOffset = 96; // navbar + breathing room
-      let current = sections[0]?.id ?? "";
-
-      for (const s of sections) {
-        const el = document.getElementById(s.id);
-        if (!el) continue;
-        const top = el.getBoundingClientRect().top;
-        if (top - headerOffset <= 0) {
-          current = s.id;
-        } else {
-          break;
-        }
-      }
-      setActiveId((prev) => (prev === current ? prev : current));
-    };
-
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-    };
-  }, [sections]);
-
-  // Keep active TOC item visible inside the sidebar scroll area
-  useEffect(() => {
-    if (!activeId) return;
-    const link = document.querySelector<HTMLElement>(`[data-toc-id="${activeId}"]`);
-    link?.scrollIntoView({ block: "nearest", behavior: "smooth" });
-  }, [activeId]);
-
-  const toc = useMemo(
-    () =>
-      sections.map((s, i) => ({
-        id: s.id,
-        title: s.title,
-        index: String(i + 1).padStart(2, "0"),
-      })),
-    [sections]
-  );
-
-  const scrollToSection = (id: string) => {
-    setActiveId(id);
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.scrollIntoView({ behavior: "smooth", block: "start" });
-    window.history.replaceState(null, "", `#${id}`);
+  const select = (changes: { version?: string; app?: string | null }) => {
+    const next = new URLSearchParams(params);
+    if (changes.version) next.set("version", changes.version);
+    if (changes.app !== undefined) {
+      if (changes.app) next.set("app", changes.app);
+      else next.delete("app");
+    }
+    setParams(next);
   };
+
+  const versionsWithApp = appParam ? versions.filter((v) => v.apps.includes(appParam)) : [];
+  const title = appAvailable
+    ? `${appName(appParam)} documentation`
+    : doc.data?.title || "Documentation";
+  const githubFile = docPath && `${DOCS_REPO_URL}/blob/${docsRepo.branch}/${docPath}`;
 
   return (
     <>
       <SEO
-        title={docs?.title || "Resources & Documentation"}
+        title={appAvailable && version ? `${appName(appParam)} docs ${versionLabel(version)}` : "Resources & Documentation"}
         description={
-          docs?.description ||
-          "Turbine documentation — getting started, platform architecture, commercial model, and industry guides."
+          doc.data?.description ||
+          "Turbine documentation by release — getting started, platform overview, and guides for every app."
         }
         path="/resources"
-        keywords="Turbine documentation, ERP documentation, business operating system guide, Turbine resources"
+        keywords="Turbine documentation, ERP documentation, release notes, Turbine app guides, Turbine resources"
       />
 
       <section className="border-b-8 border-primary bg-primary px-4 py-16 text-secondary sm:px-6 lg:px-8">
         <div className="mx-auto max-w-[1600px]">
           <SectionHeading
-            eyebrow="Resources"
-            title={docs?.title || "Documentation"}
+            eyebrow={version ? `Resources · ${versionLabel(version)}` : "Resources"}
+            title={title}
             description={
-              docs?.description ||
-              "Clear reference material for demos, onboarding, and client conversations."
+              doc.data?.description ||
+              "Pick a release version, then an app to jump straight to its guide."
             }
             light
             large
           />
-          <p className="mt-6 max-w-2xl text-sm text-secondary/75">
-            Content is generated from{" "}
-            <code className="rounded bg-secondary/10 px-1.5 py-0.5 text-secondary/80">
-              public/docs.md
-            </code>
-            . Update the markdown file to refresh this page — no code changes required.
-          </p>
         </div>
       </section>
 
-      {loading && (
-        <div className="mx-auto max-w-[1600px] px-4 py-24 text-center sm:px-6 lg:px-8">
-          <p className="text-sm font-semibold uppercase tracking-wide text-primary/80">
-            Loading documentation…
-          </p>
-        </div>
-      )}
-
-      {error && (
-        <div className="mx-auto max-w-[1600px] px-4 py-24 text-center sm:px-6 lg:px-8">
-          <p className="font-display text-2xl font-bold">Could not load docs</p>
-          <p className="mt-2 text-primary/80">{error}</p>
-          <p className="mt-4 text-sm text-primary/75">
-            Ensure <code className="bg-primary/5 px-1">public/docs.md</code> exists.
-          </p>
-          <button
-            type="button"
-            onClick={reload}
-            className="mt-6 rounded-full bg-primary px-6 py-3 text-sm font-semibold text-secondary"
-          >
-            Try again
-          </button>
-        </div>
-      )}
-
-      {docs && !loading && !error && (
-        <div className="mx-auto max-w-[1600px] lg:grid lg:grid-cols-[280px_minmax(0,1fr)]">
-          {/*
-            Desktop sidebar: sticky to viewport under the fixed header for the full
-            height of the docs column, so section links stay available on section 4/5+.
-          */}
-          <aside className="hidden lg:block">
-            <div className="sticky top-16 flex h-[calc(100dvh-4rem)] flex-col border-r-2 border-primary bg-secondary">
-              <div className="shrink-0 border-b-2 border-primary/10 px-5 py-5">
-                <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary/80">
-                  On this page
-                </p>
-              </div>
-
-              <nav className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 py-4">
-                <div className="flex flex-col gap-1">
-                  {toc.map((item) => {
-                    const active = activeId === item.id;
-                    return (
-                      <button
-                        key={item.id}
-                        type="button"
-                        data-toc-id={item.id}
-                        onClick={() => scrollToSection(item.id)}
-                        className={`flex w-full gap-3 rounded-lg px-3 py-2.5 text-left text-sm transition ${
-                          active
-                            ? "bg-primary font-semibold text-secondary"
-                            : "text-primary/80 hover:bg-primary/5 hover:text-primary"
-                        }`}
-                      >
-                        <span
-                          className={`shrink-0 tabular-nums ${
-                            active ? "text-secondary/75" : "text-primary/75"
-                          }`}
-                        >
-                          {item.index}
-                        </span>
-                        <span className="leading-snug">{item.title}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </nav>
-
-              <div className="shrink-0 border-t-2 border-primary/10 px-5 py-5">
-                <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary/80">
-                  Quick links
-                </p>
-                <div className="mt-3 flex flex-col gap-2 text-sm">
-                  <Link to="/apps" className="text-primary/80 hover:text-primary">
-                    All apps
-                  </Link>
-                  <Link to="/pricing" className="text-primary/80 hover:text-primary">
-                    Pricing
-                  </Link>
-                  <Link to="/contact" className="text-primary/80 hover:text-primary">
-                    Book a demo
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </aside>
-
-          {/* Mobile: sticky jump bar so sections stay reachable while scrolling */}
-          <div className="sticky top-14 z-30 border-b-2 border-primary bg-secondary/95 px-4 py-3 backdrop-blur-md sm:top-16 lg:hidden sm:px-6">
-            <label
-              htmlFor="resources-jump"
-              className="text-xs font-bold uppercase tracking-[0.14em] text-primary/80"
-            >
-              On this page
-            </label>
+      {/* Version (required) + app (optional) selectors */}
+      <div className="border-b-2 border-primary bg-secondary">
+        <div className="mx-auto grid max-w-[1600px] gap-4 px-4 py-5 sm:grid-cols-2 sm:px-6 lg:grid-cols-[minmax(0,320px)_minmax(0,320px)_1fr] lg:items-end lg:px-8">
+          <label className="block">
+            <span className="font-display text-xs font-bold uppercase tracking-[0.1em] text-primary/80">
+              Release version <span aria-hidden="true">*</span>
+            </span>
             <select
-              id="resources-jump"
-              className="mt-2 w-full border-2 border-primary bg-secondary px-3 py-2.5 text-sm outline-none"
-              value={activeId}
-              onChange={(e) => scrollToSection(e.target.value)}
+              required
+              disabled={!versions.length}
+              value={version?.id ?? ""}
+              onChange={(e) => select({ version: e.target.value })}
+              className="mt-2 w-full border-2 border-primary bg-secondary px-3 py-2.5 text-sm font-semibold outline-none focus-visible:ring-2 focus-visible:ring-primary"
             >
-              {toc.map((item) => (
-                <option key={item.id} value={item.id}>
-                  {item.index} — {item.title}
+              {!versions.length && <option value="">Loading versions…</option>}
+              {versions.map((v, i) => (
+                <option key={v.id} value={v.id}>
+                  {versionLabel(v)}
+                  {i === 0 ? " (latest)" : ""}
+                  {v.released ? ` — ${v.released}` : ""}
                 </option>
               ))}
             </select>
-          </div>
+          </label>
 
-          {/* Content */}
-          <div className="min-w-0">
-            {docs.sections.map((section, sIdx) => {
-              const inverted = sIdx % 2 === 1;
-              return (
-                <section
-                  key={section.id}
-                  id={section.id}
-                  className={`scroll-mt-28 border-b-2 border-primary px-4 py-14 sm:scroll-mt-32 sm:px-6 lg:scroll-mt-24 lg:px-10 ${
-                    inverted ? "bg-primary text-secondary" : ""
-                  }`}
-                >
-                  <div className="mb-8">
-                    <p
-                      className={`text-xs font-bold uppercase tracking-[0.14em] ${
-                        inverted ? "text-secondary/80" : "text-primary/80"
-                      }`}
-                    >
-                      Section {String(sIdx + 1).padStart(2, "0")}
-                    </p>
-                    <h2
-                      className={`mt-3 font-display text-4xl font-extrabold tracking-tight sm:text-5xl ${
-                        inverted ? "text-secondary" : "text-primary"
-                      }`}
-                    >
-                      {section.title}
-                    </h2>
-                  </div>
+          <label className="block">
+            <span className="font-display text-xs font-bold uppercase tracking-[0.1em] text-primary/80">
+              App <span className="font-sans normal-case tracking-normal text-primary/60">(optional)</span>
+            </span>
+            <select
+              disabled={!version}
+              value={appParam ?? ""}
+              onChange={(e) => select({ app: e.target.value || null })}
+              className="mt-2 w-full border-2 border-primary bg-secondary px-3 py-2.5 text-sm font-semibold outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            >
+              <option value="">All apps — overview</option>
+              {appParam && !appAvailable && <option value={appParam}>{appName(appParam)} (not in this version)</option>}
+              {[...(version?.apps ?? [])]
+                .sort((a, b) => appName(a).localeCompare(appName(b)))
+                .map((id) => (
+                  <option key={id} value={id}>
+                    {appName(id)}
+                  </option>
+                ))}
+            </select>
+          </label>
 
-                  {section.intro.length > 0 && (
-                    <div className="mb-10">
-                      <DocsContent blocks={section.intro} inverted={inverted} />
-                    </div>
-                  )}
-
-                  <div
-                    className={`space-y-0 border-2 ${
-                      inverted ? "border-secondary/30" : "border-primary"
-                    }`}
-                  >
-                    {section.articles.map((article, aIdx) => (
-                      <article
-                        key={article.id}
-                        id={article.id}
-                        className={`scroll-mt-36 p-6 sm:p-10 lg:scroll-mt-28 ${
-                          aIdx > 0
-                            ? inverted
-                              ? "border-t-2 border-secondary/30"
-                              : "border-t-2 border-primary"
-                            : ""
-                        }`}
-                      >
-                        <div className="flex flex-col gap-6 lg:flex-row lg:gap-12">
-                          <div className="lg:w-[30%]">
-                            <p
-                              className={`text-xs font-bold tabular-nums ${
-                                inverted ? "text-secondary/80" : "text-primary/80"
-                              }`}
-                            >
-                              {String(aIdx + 1).padStart(2, "0")}
-                            </p>
-                            <h3
-                              className={`mt-3 font-display text-2xl font-extrabold tracking-tight sm:text-3xl ${
-                                inverted ? "text-secondary" : "text-primary"
-                              }`}
-                            >
-                              {article.title}
-                            </h3>
-                          </div>
-                          <div className="flex-1">
-                            <DocsContent blocks={article.blocks} inverted={inverted} />
-                          </div>
-                        </div>
-                      </article>
-                    ))}
-                  </div>
-                </section>
-              );
-            })}
-          </div>
+          {githubFile && (
+            <a
+              href={githubFile}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 justify-self-start text-sm font-semibold text-primary/80 hover:text-primary lg:justify-self-end lg:pb-3"
+            >
+              View source on GitHub <ArrowUpRight className="h-4 w-4" />
+            </a>
+          )}
         </div>
+      </div>
+
+      {(index.loading || doc.loading) && <Message title="Loading documentation…" />}
+
+      {index.error && (
+        <Message
+          title="Could not load the list of versions"
+          body={`Check that versions.json exists in ${docsRepo.owner}/${docsRepo.repo} on the ${docsRepo.branch} branch.`}
+          onRetry={index.reload}
+        />
       )}
+
+      {/* App picked that isn't documented in this version */}
+      {version && appParam && !appAvailable && (
+        <Message
+          title={`${appName(appParam)} has no docs in ${versionLabel(version)}`}
+          body={
+            versionsWithApp.length
+              ? "It is documented in these versions:"
+              : "Choose another app, or view this version's overview."
+          }
+        >
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
+            {versionsWithApp.map((v) => (
+              <button
+                key={v.id}
+                type="button"
+                onClick={() => select({ version: v.id })}
+                className="border-2 border-primary px-4 py-2 text-sm font-bold hover:bg-primary hover:text-secondary"
+              >
+                {versionLabel(v)}
+              </button>
+            ))}
+            <button
+              type="button"
+              onClick={() => select({ app: null })}
+              className="border-2 border-primary bg-primary px-4 py-2 text-sm font-bold text-secondary"
+            >
+              {versionLabel(version)} overview
+            </button>
+          </div>
+        </Message>
+      )}
+
+      {doc.error && doc.error !== "not-found" && (
+        <Message title="Could not load this document" body={doc.error} onRetry={doc.reload} />
+      )}
+      {doc.error === "not-found" && appAvailable && version && (
+        <Message
+          title="Document missing"
+          body={`versions.json lists ${appName(appParam)} for ${versionLabel(version)}, but ${docPath} was not found in the repo.`}
+        />
+      )}
+
+      {/* Overview: apps documented in this version */}
+      {version && !appParam && !index.loading && version.apps.length > 0 && (
+        <section className="border-b-2 border-primary px-4 py-12 sm:px-6 lg:px-8">
+          <div className="mx-auto max-w-[1600px]">
+            <p className="font-display text-xs font-bold uppercase tracking-[0.1em] text-primary/80">
+              Apps documented in {versionLabel(version)}
+            </p>
+            <div className="mt-5 grid pl-[2px] pt-[2px] sm:grid-cols-2 lg:grid-cols-4">
+              {[...version.apps]
+                .sort((a, b) => appName(a).localeCompare(appName(b)))
+                .map((id) => {
+                  const app = getAppById(id);
+                  return (
+                    <Link
+                      key={id}
+                      to={`/resources?version=${encodeURIComponent(version.id)}&app=${encodeURIComponent(id)}`}
+                      className="-ml-[2px] -mt-[2px] flex items-center gap-3 border-2 border-primary p-5 font-display font-extrabold transition-colors hover:bg-primary hover:text-secondary"
+                    >
+                      {app && (
+                        <span className="border-2 border-current p-2">
+                          <Icon name={app.icon} className="h-4 w-4" />
+                        </span>
+                      )}
+                      {appName(id)}
+                      <ArrowUpRight className="ml-auto h-4 w-4 opacity-60" />
+                    </Link>
+                  );
+                })}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {doc.data && <DocsViewer docs={doc.data} />}
 
       <CTASection />
     </>
+  );
+}
+
+function Message({
+  title,
+  body,
+  onRetry,
+  children,
+}: {
+  title: string;
+  body?: string;
+  onRetry?: () => void;
+  children?: ReactNode;
+}) {
+  return (
+    <div className="mx-auto max-w-[1600px] px-4 py-20 text-center sm:px-6 lg:px-8">
+      <p className="font-display text-2xl font-bold">{title}</p>
+      {body && <p className="mx-auto mt-2 max-w-xl text-primary/80">{body}</p>}
+      {children}
+      {onRetry && (
+        <button
+          type="button"
+          onClick={onRetry}
+          className="mt-6 border-2 border-primary bg-primary px-6 py-3 text-sm font-semibold text-secondary"
+        >
+          Try again
+        </button>
+      )}
+    </div>
   );
 }

@@ -4,7 +4,7 @@
   --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
   --color-primary: #0a0a0a;
-  --color-secondary: #eee5d1;
+  --color-secondary: #e8dcc8;
 }
 
 html {
@@ -64,12 +64,15 @@ body {
   }
 }
 
-/* Prevent accidental horizontal scroll on mobile */
-img,
-svg,
-video {
-  max-width: 100%;
-  height: auto;
+/* Prevent accidental horizontal scroll on mobile.
+   In the base layer so utilities like h-full can still override it. */
+@layer base {
+  img,
+  svg,
+  video {
+    max-width: 100%;
+    height: auto;
+  }
 }
 
 /* Walkthrough media — blurred & tinted in site colours until hovered */
