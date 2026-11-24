@@ -49,6 +49,32 @@ export const walkthroughs: Record<string, WalkthroughSection[]> = {
       points: ["P&L, balance sheet and cash flow", "Lock dates stop changes to closed periods", "Every entry traces back to its source document"],
     },
   ],
+  gst: [
+    {
+      title: "GSTR-1 ready in one click",
+      description: "Fetch the month’s posted invoices and credit notes and download GSTR-1 in the GST portal’s offline JSON format, with CSV and Excel copies.",
+      image: "/images/walkthrough/finance-1.jpg",
+      points: ["Sorted into B2B, B2CL, B2CS, CDNR, CDNUR and Export automatically", "HSN-wise summary with GST units", "Documents-issued summary with every return"],
+    },
+    {
+      title: "GSTR-3B and GSTR-9 from your books",
+      description: "Monthly outward supplies and eligible ITC for GSTR-3B, and year-end data for GSTR-9 Tables 4 to 18, worked out from the same accounting records.",
+      image: "/images/walkthrough/finance-2.jpg",
+      points: ["Inter-state sales to unregistered buyers included", "Built-in validation checks for the annual return", "JSON, CSV and Excel downloads"],
+    },
+    {
+      title: "Input tax credit and special supplies",
+      description: "Tag each vendor bill for ITC and flag reverse-charge documents, while nil-rated, exempt, export and SEZ supplies are summarised for you.",
+      image: "/images/walkthrough/finance-3.jpg",
+      points: ["Inputs, Capital goods, Input services or Ineligible", "Exports and SEZ with or without tax payment", "Nil-rated, exempt and non-GST sales summarised"],
+    },
+    {
+      title: "Every return tracked to filed",
+      description: "A GST dashboard shows invoice counts by category, and every return and invoice moves from Not uploaded to Ready, Uploaded and Filed, with the ARN on each return.",
+      image: "/images/walkthrough/finance-1.jpg",
+      points: ["Monthly or quarterly periods created in one click", "Separate returns and records for each company", "Invoice counts for B2B, B2CL, B2CS, Export, Import, CDNR and CDNUR"],
+    },
+  ],
   expenses: [
     {
       title: "Snap a receipt, done",

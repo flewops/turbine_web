@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { company } from "../data/company";
-import { footerNav } from "../data/navigation";
+import { footerNav, legalLinks } from "../data/navigation";
 
 export default function Footer() {
   return (
@@ -47,9 +47,13 @@ export default function Footer() {
           <p className="text-sm font-medium text-secondary/75">
             © {new Date().getFullYear()} {company.name}
           </p>
-          <p className="text-sm font-medium text-secondary/75">
-            Privacy policy | Cookies | Terms & Conditions
-          </p>
+          <nav aria-label="Legal" className="flex flex-wrap gap-x-5 gap-y-2 text-sm font-medium text-secondary/75">
+            {legalLinks.map((l) => (
+              <Link key={l.href} to={l.href} className="transition-colors hover:text-secondary hover:underline underline-offset-4">
+                {l.label}
+              </Link>
+            ))}
+          </nav>
         </div>
       </div>
     </footer>

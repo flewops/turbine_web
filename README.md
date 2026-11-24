@@ -21,4 +21,4 @@ npm run lint
 
 - `dist/sitemap.xml` is generated on every build from the routes in `vite.config.ts` plus every app and industry in `src/data/`, so new entries are included automatically. Add any new top-level page to `staticRoutes` there.
 - `public/robots.txt` points crawlers at the sitemap.
-- `vercel.json` serves `index.html` for client-side routes so deep links like `/apps/crm` load directly.
+- `public/_redirects` (Netlify) serves `index.html` for client-side routes so deep links like `/apps/crm` load directly.

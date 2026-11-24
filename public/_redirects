@@ -1,0 +1,3 @@
+# Netlify: serve the single-page app for every route (e.g. /resources, /apps/crm).
+# Real files such as /sitemap.xml, /robots.txt and /assets/* are served first.
+/*    /index.html    200

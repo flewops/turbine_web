@@ -69,19 +69,19 @@ export const homepageHighlights = [
     title: "Finance that stays current",
     description: "Accounting, invoicing, and expenses update as the business moves — not days later.",
     href: "/apps/accounting",
-    icon: "Calculator",
+    icon: "FileDollar",
   },
   {
     title: "Sales with a memory",
     description: "CRM and sales apps keep every conversation, quote, and order connected.",
     href: "/apps/crm",
-    icon: "HeartHandshake",
+    icon: "Handshake",
   },
   {
     title: "Supply chain without blind spots",
     description: "Inventory, manufacturing, and purchasing share one live operational picture.",
     href: "/apps/inventory",
-    icon: "Boxes",
+    icon: "Box",
   },
   {
     title: "People operations included",

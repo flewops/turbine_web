@@ -27,3 +27,9 @@ export const footerNav = {
     { label: "Services", href: "/apps?category=services" },
   ],
 } as const;
+
+export const legalLinks = [
+  { label: "Privacy Policy", href: "/privacy" },
+  { label: "Cookie Policy", href: "/cookies" },
+  { label: "Terms & Conditions", href: "/terms" },
+] as const;

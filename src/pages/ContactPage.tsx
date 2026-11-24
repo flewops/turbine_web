@@ -1,14 +1,49 @@
+import { Link } from "react-router-dom";
 import { useState, type FormEvent } from "react";
 import { Mail, Phone, Send, CheckCircle2 } from "lucide-react";
 import SEO from "../components/SEO";
 import SectionHeading from "../components/SectionHeading";
 import { company } from "../data/company";
+import { CONTACT_FORM_ENDPOINT } from "../data/forms";
 
 export default function ContactPage() {
-  const [submitted, setSubmitted] = useState(false);
-  const onSubmit = (e: FormEvent) => {
+  const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSubmitted(true);
+    const form = new FormData(e.currentTarget);
+    const field = (name: string) => String(form.get(name) ?? "").trim();
+
+    // Honeypot: real visitors never see or fill this field; bots usually do.
+    if (field("website")) {
+      setStatus("success");
+      return;
+    }
+
+    setStatus("submitting");
+    try {
+      const res = await fetch(CONTACT_FORM_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          _subject: `New enquiry from ${field("name")} — Turbine website`,
+          _template: "table",
+          name: field("name"),
+          email: field("email"), // FormSubmit uses this as the reply-to address
+          company: field("company") || "—",
+          message: field("message"),
+          page: window.location.href,
+        }),
+      });
+      const result = (await res.json().catch(() => ({}))) as { success?: string | boolean; message?: string };
+      if (!res.ok || String(result.success) !== "true") {
+        throw new Error(result.message || `Request failed (${res.status})`);
+      }
+      setStatus("success");
+    } catch (err) {
+      console.error(err);
+      setStatus("error");
+    }
   };
 
   const fieldClass =
@@ -31,56 +66,55 @@ export default function ContactPage() {
       <section className="mx-auto max-w-[1600px] px-4 py-14 sm:px-6 lg:px-8">
         <div className="grid gap-6 lg:grid-cols-[1.3fr_0.7fr]">
           <div className="border-2 border-primary p-8 sm:p-10">
-            {submitted ? (
+            {status === "success" ? (
               <div className="flex flex-col items-center py-16 text-center">
                 <CheckCircle2 className="h-12 w-12" />
                 <h2 className="mt-4 font-display text-2xl font-extrabold">Message received</h2>
                 <p className="mt-2 max-w-md text-primary/80">Thanks for reaching out. Our team will get back to you shortly.</p>
               </div>
             ) : (
-              <form onSubmit={onSubmit} className="space-y-6">
+              <form onSubmit={onSubmit} className="relative space-y-6">
                 <div className="grid gap-6 sm:grid-cols-2">
                   <div>
                     <label htmlFor="name" className="text-xs font-bold uppercase tracking-wide text-primary/75">Full name</label>
-                    <input id="name" name="name" required className={fieldClass} placeholder="Sujith" />
+                    <input id="name" name="name" required maxLength={120} autoComplete="name" className={fieldClass} placeholder="Sujith" />
                   </div>
                   <div>
                     <label htmlFor="email" className="text-xs font-bold uppercase tracking-wide text-primary/75">Work email</label>
-                    <input id="email" name="email" type="email" required className={fieldClass} placeholder="sujith@company.com" />
-                  </div>
-                </div>
-                <div className="grid gap-6 sm:grid-cols-2">
-                  <div>
-                    <label htmlFor="company" className="text-xs font-bold uppercase tracking-wide text-primary/75">Company</label>
-                    <input id="company" name="company" className={fieldClass} placeholder="Industry Ltd." />
-                  </div>
-                  <div>
-                    <label htmlFor="users" className="text-xs font-bold uppercase tracking-wide text-primary/75">Team size</label>
-                    <select id="users" name="users" className={fieldClass} defaultValue="">
-                      <option value="" disabled>Select range</option>
-                      <option>1–10 users</option>
-                      <option>11–50 users</option>
-                      <option>51–200 users</option>
-                      <option>200+ users</option>
-                    </select>
+                    <input id="email" name="email" type="email" required maxLength={200} autoComplete="email" className={fieldClass} placeholder="sujith@company.com" />
                   </div>
                 </div>
                 <div>
-                  <label htmlFor="interest" className="text-xs font-bold uppercase tracking-wide text-primary/75">What are you exploring?</label>
-                  <select id="interest" name="interest" className={fieldClass} defaultValue="demo">
-                    <option value="demo">Product demo</option>
-                    <option value="pricing">Pricing discussion</option>
-                    <option value="implementation">Implementation planning</option>
-                    <option value="industry">Industry-specific walkthrough</option>
-                  </select>
+                  <label htmlFor="company" className="text-xs font-bold uppercase tracking-wide text-primary/75">Company</label>
+                  <input id="company" name="company" maxLength={160} autoComplete="organization" className={fieldClass} placeholder="Industry Ltd." />
                 </div>
                 <div>
                   <label htmlFor="message" className="text-xs font-bold uppercase tracking-wide text-primary/75">Message</label>
-                  <textarea id="message" name="message" rows={5} required className={fieldClass} placeholder="Tell us about your current tools..." />
+                  <textarea id="message" name="message" rows={5} required maxLength={5000} className={fieldClass} placeholder="Tell us about your current tools..." />
                 </div>
-                <button type="submit" className="inline-flex items-center gap-2 border-2 border-primary bg-primary px-7 py-3.5 text-sm font-bold text-secondary transition hover:bg-secondary hover:text-primary">
-                  Send message <Send className="h-4 w-4" />
+                {/* Honeypot — hidden from people and screen readers */}
+                <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
+                  <label htmlFor="website">Website</label>
+                  <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" />
+                </div>
+                {status === "error" && (
+                  <p role="alert" className="border-2 border-primary bg-primary px-4 py-3 text-sm font-semibold text-secondary">
+                    Your message couldn't be sent. Please try again in a moment, or email us at{" "}
+                    <a href={`mailto:${company.email}`} className="underline">{company.email}</a>.
+                  </p>
+                )}
+                <button
+                  type="submit"
+                  disabled={status === "submitting"}
+                  className="inline-flex items-center gap-2 border-2 border-primary bg-primary px-7 py-3.5 text-sm font-bold text-secondary transition hover:bg-secondary hover:text-primary disabled:cursor-wait disabled:opacity-70"
+                >
+                  {status === "submitting" ? "Sending…" : "Send message"}
+                  {status !== "submitting" && <Send className="h-4 w-4" />}
                 </button>
+                <p className="text-xs text-primary/65">
+                  We use your details only to reply to your enquiry. See our{" "}
+                  <Link to="/privacy" className="font-semibold underline underline-offset-2 hover:text-primary">Privacy Policy</Link>.
+                </p>
               </form>
             )}
           </div>

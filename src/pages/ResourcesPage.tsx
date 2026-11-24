@@ -6,12 +6,15 @@ import SectionHeading from "../components/SectionHeading";
 import CTASection from "../components/CTASection";
 import DocsViewer from "../components/DocsViewer";
 import Icon from "../components/IconMap";
+import Select from "../components/Select";
 import { useDocs, useDocsIndex } from "../hooks/useDocs";
 import { getAppById } from "../data/apps";
 import { DOCS_REPO_URL, docsRepo, type DocsVersion } from "../data/docsSource";
 
+/** Display name for a doc file: the app's name, or — for topics like `gst` that aren't apps — a name from the id. */
 const appName = (id: string) =>
-  getAppById(id)?.name ?? id.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+  getAppById(id)?.name ??
+  (id.length <= 3 ? id.toUpperCase() : id.replace(/[-_]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()));
 
 const versionLabel = (v: DocsVersion) => v.label ?? v.id;
 
@@ -88,49 +91,44 @@ export default function ResourcesPage() {
       {/* Version (required) + app (optional) selectors */}
       <div className="border-b-2 border-primary bg-secondary">
         <div className="mx-auto grid max-w-[1600px] gap-4 px-4 py-5 sm:grid-cols-2 sm:px-6 lg:grid-cols-[minmax(0,320px)_minmax(0,320px)_1fr] lg:items-end lg:px-8">
-          <label className="block">
-            <span className="font-display text-xs font-bold uppercase tracking-[0.1em] text-primary/80">
+          <div>
+            <span id="docs-version-label" className="font-display text-xs font-bold uppercase tracking-[0.1em] text-primary/80">
               Release version <span aria-hidden="true">*</span>
             </span>
-            <select
-              required
+            <Select
+              labelId="docs-version-label"
+              className="mt-2"
               disabled={!versions.length}
+              placeholder="Loading versions…"
               value={version?.id ?? ""}
-              onChange={(e) => select({ version: e.target.value })}
-              className="mt-2 w-full border-2 border-primary bg-secondary px-3 py-2.5 text-sm font-semibold outline-none focus-visible:ring-2 focus-visible:ring-primary"
-            >
-              {!versions.length && <option value="">Loading versions…</option>}
-              {versions.map((v, i) => (
-                <option key={v.id} value={v.id}>
-                  {versionLabel(v)}
-                  {i === 0 ? " (latest)" : ""}
-                  {v.released ? ` — ${v.released}` : ""}
-                </option>
-              ))}
-            </select>
-          </label>
+              onChange={(v) => select({ version: v })}
+              options={versions.map((v, i) => ({
+                value: v.id,
+                label: versionLabel(v),
+                hint: [i === 0 ? "Latest" : null, v.released].filter(Boolean).join(" · ") || undefined,
+              }))}
+            />
+          </div>
 
-          <label className="block">
-            <span className="font-display text-xs font-bold uppercase tracking-[0.1em] text-primary/80">
+          <div>
+            <span id="docs-app-label" className="font-display text-xs font-bold uppercase tracking-[0.1em] text-primary/80">
               App <span className="font-sans normal-case tracking-normal text-primary/60">(optional)</span>
             </span>
-            <select
+            <Select
+              labelId="docs-app-label"
+              className="mt-2"
               disabled={!version}
               value={appParam ?? ""}
-              onChange={(e) => select({ app: e.target.value || null })}
-              className="mt-2 w-full border-2 border-primary bg-secondary px-3 py-2.5 text-sm font-semibold outline-none focus-visible:ring-2 focus-visible:ring-primary"
-            >
-              <option value="">All apps — overview</option>
-              {appParam && !appAvailable && <option value={appParam}>{appName(appParam)} (not in this version)</option>}
-              {[...(version?.apps ?? [])]
-                .sort((a, b) => appName(a).localeCompare(appName(b)))
-                .map((id) => (
-                  <option key={id} value={id}>
-                    {appName(id)}
-                  </option>
-                ))}
-            </select>
-          </label>
+              onChange={(v) => select({ app: v || null })}
+              options={[
+                { value: "", label: "All apps — overview" },
+                ...(appParam && !appAvailable ? [{ value: appParam, label: appName(appParam), hint: "Not in this version" }] : []),
+                ...[...(version?.apps ?? [])]
+                  .sort((x, y) => appName(x).localeCompare(appName(y)))
+                  .map((id) => ({ value: id, label: appName(id) })),
+              ]}
+            />
+          </div>
 
           {githubFile && (
             <a

@@ -32,26 +32,62 @@ export default function IndustryDetailPage() {
           </div>
         </header>
 
-        {/* PROBLEMS → FIXES — each card pairs an industry problem with how Turbine solves it */}
-        <section className="mx-auto max-w-[1600px] px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
-          <SectionHeading eyebrow="What Turbine fixes" title="The problems we solve" />
+        {/* CHALLENGES → SOLUTIONS — compact two-column comparison: the problem, then how Turbine solves it */}
+        <section className="mx-auto max-w-[1600px] px-4 py-14 sm:px-6 sm:py-16 lg:px-8">
+          <SectionHeading eyebrow="Challenges & solutions" title="Common challenges, solved" />
 
-          <div className="mt-10 grid gap-6 md:grid-cols-2">
-            {industry.solutions.map((s) => (
-              <div key={s.title} className="flex flex-col border-2 border-primary">
-                <div className="p-6 sm:p-8">
-                  <p className="font-display text-xs font-bold uppercase tracking-[0.1em] text-primary/60">Problem</p>
-                  <p className="mt-2 font-display text-lg font-bold leading-snug text-primary/80 sm:text-xl">{s.problem}</p>
-                </div>
-                <div className="mt-auto flex gap-4 border-t-2 border-primary bg-primary p-6 text-secondary sm:p-8">
-                  <Check className="mt-1 h-5 w-5 shrink-0" />
-                  <div>
-                    <h3 className="font-display text-xl font-extrabold sm:text-2xl">{s.title}</h3>
-                    <p className="mt-1.5 text-base leading-relaxed text-secondary/80">{s.description}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="mt-8 border-2 border-primary">
+            <div className="hidden bg-primary text-secondary md:grid md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
+              <p className="px-6 py-3 font-display text-xs font-bold uppercase tracking-[0.1em] text-secondary/80">The challenge</p>
+              <p className="border-l-2 border-secondary/20 px-6 py-3 font-display text-xs font-bold uppercase tracking-[0.1em] text-secondary/80">
+                How Turbine solves it
+              </p>
+            </div>
+
+            <ol>
+              {industry.solutions.map((s, i) => {
+                const apps = s.apps.map((id) => getAppById(id)).filter((app) => app !== undefined);
+                return (
+                  <li
+                    key={s.title}
+                    className={`grid border-primary md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] ${i > 0 ? "border-t-2" : "md:border-t-2"}`}
+                  >
+                    <div className="flex gap-4 px-5 py-5 sm:px-6 md:py-6">
+                      <span className="pt-0.5 font-display text-sm font-bold tabular-nums text-primary/40">
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <div>
+                        <p className="mb-1 font-display text-[11px] font-bold uppercase tracking-[0.1em] text-primary/55 md:hidden">The challenge</p>
+                        <p className="font-display text-lg font-semibold leading-snug text-primary/75">{s.problem}</p>
+                      </div>
+                    </div>
+
+                    <div className="border-t border-primary/15 bg-primary/[0.04] px-5 py-5 sm:px-6 md:border-l-2 md:border-t-0 md:border-primary md:py-6">
+                      <p className="mb-1 font-display text-[11px] font-bold uppercase tracking-[0.1em] text-primary/55 md:hidden">How Turbine solves it</p>
+                      <h3 className="flex items-center gap-2 font-display text-lg font-extrabold">
+                        <Check className="h-4 w-4 shrink-0" aria-hidden="true" />
+                        {s.title}
+                      </h3>
+                      <p className="mt-1 text-[15px] leading-relaxed text-primary/75">{s.description}</p>
+                      {apps.length > 0 && (
+                        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5">
+                          {apps.map((app) => (
+                            <Link
+                              key={app.id}
+                              to={`/apps/${app.id}`}
+                              className="inline-flex items-center gap-1.5 text-xs font-bold text-primary/80 underline-offset-4 hover:text-primary hover:underline"
+                            >
+                              <Icon name={app.icon} className="h-3.5 w-3.5" />
+                              {app.name}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
           </div>
         </section>
 
