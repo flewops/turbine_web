@@ -2,7 +2,7 @@ export const company = {
   name: "Turbine",
   tagline: "Your Business deserves an Operating System",
   description:
-    "Turbine is a fully integrated business operating system that unifies finance, sales, supply chain, HR, marketing, and operations — hosted on AWS and managed end-to-end for you.",
+    "FlewOps Turbine is a horizontal business operating platform with deep industry-specific capabilities. One connected platform for finance, sales, inventory, manufacturing, people, and operations.",
   email: "turbine@flewops.com",
   phone: "+91 88255 72114",
   website: "https://turbine.flewops.com",

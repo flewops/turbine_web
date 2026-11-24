@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { playClick, playHover, unlockAudio } from "../lib/uiSound";
 
-const INTERACTIVE = 'a[href], button:not(:disabled), [role="button"], summary, input[type="submit"], input[type="button"], select';
+const INTERACTIVE = 'a[href], button:not(:disabled), [role="button"], [role="combobox"]:not([aria-disabled]), [role="option"]:not([aria-disabled]), summary, input[type="submit"], input[type="button"], select';
 
 /** Plays hover/click sounds for every link and button on the page. Mount once. */
 export function useUiSounds() {

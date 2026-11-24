@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { parseDocsMarkdown, type ParsedDocs } from "../lib/parseDocsMarkdown";
-import { DOCS_BASE_URL, docsUrl, type DocsIndex } from "../data/docsSource";
+import { resolveDocsBase, type DocsIndex } from "../data/docsSource";
 
 interface RemoteState<T> {
   /** URL this result belongs to — anything else means "still loading". */
@@ -57,6 +57,21 @@ function useRemote<T>(url: string | null, parse: (text: string, url: string) => 
   };
 }
 
+/** Base URL of the docs files (pinned to the latest commit); null until resolved. */
+function useDocsBase() {
+  const [base, setBase] = useState<string | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    resolveDocsBase().then((b) => {
+      if (!cancelled) setBase(b);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  return base;
+}
+
 const parseIndex = (text: string): DocsIndex => {
   const json = JSON.parse(text) as Partial<DocsIndex>;
   if (!Array.isArray(json.versions)) throw new Error("versions.json is missing a \"versions\" list");
@@ -65,17 +80,19 @@ const parseIndex = (text: string): DocsIndex => {
 
 /**
  * Rewrites links/images in a docs file:
- * - `crm.md`, `../v1.1/index.md` → in-site routes (/resources?version=…&app=…)
+ * - `crm.md`, `../1.1/index.md` → in-site routes (/resources?version=…&app=…)
  * - other relative paths (images) → absolute URLs next to the file
  */
 function docsUrlResolver(fileUrl: string) {
+  // Docs files live at <base>/<version>/<file>.md
+  const base = fileUrl.replace(/\/[^/]+\/[^/]+$/, "");
   return (url: string, kind: "link" | "image") => {
     if (/^([a-z][a-z\d+.-]*:|#|\/)/i.test(url)) return url; // absolute, anchor or site path
     const absolute = new URL(url, fileUrl).href;
 
     if (kind === "link") {
       const [path, hash = ""] = absolute.split("#");
-      const match = path.startsWith(DOCS_BASE_URL + "/") && path.slice(DOCS_BASE_URL.length + 1).match(/^([^/]+)\/([^/]+)\.md$/);
+      const match = path.startsWith(base + "/") && path.slice(base.length + 1).match(/^([^/]+)\/([^/]+)\.md$/);
       if (match) {
         const [, version, file] = match;
         const params = new URLSearchParams({ version });
@@ -92,10 +109,14 @@ const parseDoc = (text: string, url: string): ParsedDocs =>
 
 /** Loads `versions.json` from the docs repo. */
 export function useDocsIndex() {
-  return useRemote(docsUrl("versions.json"), parseIndex);
+  const base = useDocsBase();
+  const remote = useRemote(base ? `${base}/versions.json` : null, parseIndex);
+  return { ...remote, loading: remote.loading || base === null };
 }
 
 /** Loads one markdown file (`<version>/<file>.md`) from the docs repo; pass null to skip. */
 export function useDocs(path: string | null) {
-  return useRemote(path ? docsUrl(path) : null, parseDoc);
+  const base = useDocsBase();
+  const remote = useRemote(base && path ? `${base}/${path}` : null, parseDoc);
+  return { ...remote, loading: remote.loading || (path !== null && base === null) };
 }

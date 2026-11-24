@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import DocsContent from "./DocsContent";
+import Select from "./Select";
 import type { ParsedDocs } from "../lib/parseDocsMarkdown";
 
 /** Renders a parsed docs file: sticky contents sidebar (mobile jump menu) and numbered sections. */
@@ -143,24 +144,19 @@ export default function DocsViewer({ docs }: { docs: ParsedDocs }) {
 
         {/* Mobile: sticky jump bar so sections stay reachable while scrolling */}
         <div className="sticky top-14 z-30 border-b-2 border-primary bg-secondary/95 px-4 py-3 backdrop-blur-md sm:top-16 lg:hidden sm:px-6">
-          <label
-            htmlFor="resources-jump"
+          <span
+            id="resources-jump-label"
             className="text-xs font-bold font-display uppercase tracking-[0.1em] text-primary/80"
           >
             On this page
-          </label>
-          <select
-            id="resources-jump"
-            className="mt-2 w-full border-2 border-primary bg-secondary px-3 py-2.5 text-sm outline-none"
+          </span>
+          <Select
+            labelId="resources-jump-label"
+            className="mt-2"
             value={activeId}
-            onChange={(e) => scrollToSection(e.target.value)}
-          >
-            {toc.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item.index} — {item.title}
-              </option>
-            ))}
-          </select>
+            onChange={scrollToSection}
+            options={toc.map((item) => ({ value: item.id, label: `${item.index} — ${item.title}` }))}
+          />
         </div>
 
         {/* Content */}

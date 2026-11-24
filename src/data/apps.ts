@@ -88,7 +88,7 @@ export const apps: App[] = [
     tagline: "Books that update themselves",
     description:
       "Manage finances on the go with automatic data entry, bank synchronization, and real-time reporting so decisions stay grounded in live numbers.",
-    icon: "Calculator",
+    icon: "FileDollar",
     color: "bg-primary",
     features: [
       { title: "Reduced manual entry", description: "AI-assisted bill digitization, bank feeds, and reconciliation models cut busywork." },
@@ -100,13 +100,36 @@ export const apps: App[] = [
     ],
   },
   {
+    id: "gst",
+    name: "GST",
+    category: "finance",
+    tagline: "GST returns straight from your books",
+    description:
+      "Prepare GSTR-1, GSTR-3B and GSTR-9 from your posted invoices and bills — sorted into the right GST sections automatically, checked, and downloaded in the GST portal’s format.",
+    icon: "ReceiptIndianRupee",
+    color: "bg-primary",
+    features: [
+      { title: "GSTR-1 Return Files", description: "Fetch the month’s invoices in one click and download GSTR-1 in the GST portal’s offline JSON format, with CSV and Excel copies." },
+      { title: "Automatic Invoice Classification", description: "Posted invoices and credit notes sorted into B2B, B2CL, B2CS, CDNR, CDNUR and Export sections, with no manual tagging." },
+      { title: "GSTR-3B Summary", description: "Monthly outward supplies, inter-state sales to unregistered buyers and eligible ITC worked out from your books." },
+      { title: "GSTR-9 Annual Return", description: "Year-end data for Tables 4 to 18, with HSN lines, built-in validation checks, and JSON, CSV and Excel downloads." },
+      { title: "HSN & Document Summaries", description: "HSN-wise summary with GST units, and the documents-issued summary, produced with every GSTR-1." },
+      { title: "Nil, Exempt & Zero-Rated Sales", description: "Nil-rated, exempt and non-GST sales summarised; exports and SEZ supplies tagged with or without tax payment." },
+      { title: "ITC & Reverse Charge Tagging", description: "Mark each vendor bill as Inputs, Capital goods, Input services or Ineligible, and flag reverse-charge documents." },
+      { title: "GST Dashboard", description: "Invoice counts by GST category (B2B, B2CL, B2CS, Export, Import, CDNR, CDNUR) at a glance." },
+      { title: "Filing Status Tracking", description: "Follow every return and invoice from Not uploaded to Ready, Uploaded and Filed, with the ARN noted on each return." },
+      { title: "GST Periods", description: "Fiscal years with monthly or quarterly return periods, created in one click." },
+      { title: "Multi-Company GST", description: "Separate returns, periods and records for each company in one Turbine instance." },
+    ],
+  },
+  {
     id: "expenses",
     name: "Expenses",
     category: "finance",
     tagline: "Claims without the paperwork chase",
     description:
       "Submit, approve, and reimburse expenses with one-click approvals and automatic accounting integration.",
-    icon: "Receipt",
+    icon: "HandCoins",
     color: "bg-primary",
     features: [
       { title: "Faster reporting", description: "Submit via desktop, mobile, or by emailing receipts directly into Turbine." },
@@ -122,7 +145,7 @@ export const apps: App[] = [
     tagline: "Live data, not stale exports",
     description:
       "Connect spreadsheets to your business apps for real-time updates, collaboration, and charts that reflect the truth.",
-    icon: "Table",
+    icon: "LayoutDashboard",
     color: "bg-primary",
     features: [
       { title: "Data integration", description: "Pull live data from Turbine apps — no manual copy-paste." },
@@ -139,7 +162,7 @@ export const apps: App[] = [
     tagline: "Pipeline clarity that closes deals",
     description:
       "Visual pipelines, quick quotes, mobile access, and unified communication to keep every opportunity moving.",
-    icon: "HeartHandshake",
+    icon: "Handshake",
     color: "bg-primary",
     features: [
       { title: "Visual sales pipeline", description: "Drag-and-drop deal tracking with real-time insights." },
@@ -157,7 +180,7 @@ export const apps: App[] = [
     tagline: "From quote to cash, end to end",
     description:
       "Close more deals with professional quotes, order management, customer portals, and integrated eCommerce flows.",
-    icon: "ShoppingCart",
+    icon: "ChartColumnIncreasing",
     color: "bg-primary",
     features: [
       { title: "Centralized view", description: "Sales orders, customer service, and eCommerce in one place." },
@@ -222,7 +245,7 @@ export const apps: App[] = [
     tagline: "Stock you can trust in real time",
     description:
       "Real-time tracking, automated replenishment, multi-warehouse visibility, and barcode-driven operations.",
-    icon: "Boxes",
+    icon: "Box",
     color: "bg-primary",
     features: [
       { title: "Replenishment automation", description: "Min-max, MTO, and MPS strategies with vendor follow-ups." },
@@ -256,7 +279,7 @@ export const apps: App[] = [
     tagline: "Procurement that stays ahead of demand",
     description:
       "Automated RFQs, vendor comparison, agreements, and billing tied directly to inventory levels.",
-    icon: "Truck",
+    icon: "CreditCard",
     color: "bg-primary",
     features: [
       { title: "Optimize purchases", description: "Custom agreements, quote comparison, and recurring order automation." },
@@ -355,7 +378,7 @@ export const apps: App[] = [
     tagline: "Talk to visitors while intent is high",
     description:
       "Engage website visitors in real time, qualify leads, and hand off conversations to the right team.",
-    icon: "MessageCircle",
+    icon: "MessagesSquare",
     color: "bg-primary",
     features: [
       { title: "Real-time engagement", description: "Chat with visitors the moment they need help." },
@@ -401,7 +424,7 @@ export const apps: App[] = [
     tagline: "Hire with a pipeline, not a pile of resumes",
     description:
       "Publish openings, track applicants, schedule interviews, and collaborate on hiring decisions.",
-    icon: "UserPlus",
+    icon: "UserRoundSearch",
     color: "bg-primary",
     features: [
       { title: "Applicant pipeline", description: "Kanban-style stages from application to offer." },
@@ -416,7 +439,7 @@ export const apps: App[] = [
     tagline: "Leave requests without email threads",
     description:
       "Request, approve, and balance time off with clear policies and calendars for the whole team.",
-    icon: "Palmtree",
+    icon: "Umbrella",
     color: "bg-primary",
     features: [
       { title: "Simple requests", description: "Employees submit leave in seconds." },
@@ -475,7 +498,7 @@ export const apps: App[] = [
     tagline: "Decisions without the inbox bottleneck",
     description:
       "Route requests for purchases, expenses, time, and more through configurable approval workflows.",
-    icon: "CheckCircle",
+    icon: "FileCheck",
     color: "bg-primary",
     features: [
       { title: "Configurable workflows", description: "Define who approves what and when." },
@@ -490,7 +513,7 @@ export const apps: App[] = [
     tagline: "Know who is in — accurately",
     description:
       "Track check-ins and working hours with simple tools that feed payroll and planning.",
-    icon: "Clock",
+    icon: "Gauge",
     color: "bg-primary",
     features: [
       { title: "Easy check-in", description: "Employees clock in from kiosk, mobile, or desktop." },
@@ -505,7 +528,7 @@ export const apps: App[] = [
     tagline: "Vehicles managed like any other asset",
     description:
       "Track company vehicles, assignments, costs, and service schedules from one dashboard.",
-    icon: "Car",
+    icon: "SteeringWheel",
     color: "bg-primary",
     features: [
       { title: "Vehicle registry", description: "Central records for every company vehicle." },
@@ -521,7 +544,7 @@ export const apps: App[] = [
     tagline: "Campaigns that connect to CRM reality",
     description:
       "Design, send, and measure email campaigns with audiences drawn from your live customer data.",
-    icon: "Mail",
+    icon: "Send",
     color: "bg-primary",
     features: [
       { title: "Visual campaign builder", description: "Create emails without wrestling with HTML." },
@@ -580,7 +603,7 @@ export const apps: App[] = [
     tagline: "From registration to follow-up",
     description:
       "Plan events, manage attendees, track tickets, and convert participants into opportunities.",
-    icon: "CalendarDays",
+    icon: "PartyPopper",
     color: "bg-primary",
     features: [
       { title: "Registration & tickets", description: "Sell or manage event access with ease." },
@@ -595,7 +618,7 @@ export const apps: App[] = [
     tagline: "Feedback you can act on",
     description:
       "Create surveys and questionnaires to capture customer and employee insights.",
-    icon: "ClipboardList",
+    icon: "ListChecks",
     color: "bg-primary",
     features: [
       { title: "Flexible forms", description: "Build surveys with multiple question types." },
@@ -611,7 +634,7 @@ export const apps: App[] = [
     tagline: "Delivery you can see and steer",
     description:
       "Plan projects with tasks, milestones, and profitability views tied to timesheets and billing.",
-    icon: "Kanban",
+    icon: "Check",
     color: "bg-primary",
     features: [
       { title: "Task management", description: "Kanban, list, and Gantt views for every project style." },
@@ -717,7 +740,7 @@ export const apps: App[] = [
     tagline: "Chat next to the work itself",
     description:
       "Team messaging linked to records so conversations stay in context — not lost in a side app.",
-    icon: "MessagesSquare",
+    icon: "MessageCircle",
     color: "bg-primary",
     features: [
       { title: "Contextual chat", description: "Discuss on orders, tickets, and projects directly." },

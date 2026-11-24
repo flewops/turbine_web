@@ -5,7 +5,7 @@ import { apps } from "./src/data/apps";
 import { industries } from "./src/data/industries";
 import { company } from "./src/data/company";
 
-const staticRoutes = ["/", "/apps", "/industries", "/pricing", "/features", "/resources", "/about", "/contact"];
+const staticRoutes = ["/", "/apps", "/industries", "/pricing", "/features", "/resources", "/about", "/contact", "/privacy", "/cookies", "/terms"];
 
 /** Emits dist/sitemap.xml from the route list and the app/industry data, so it never drifts from the site. */
 function sitemap(): Plugin {

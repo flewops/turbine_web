@@ -11,6 +11,7 @@ import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 import ResourcesPage from "./pages/ResourcesPage";
 import NotFoundPage from "./pages/NotFoundPage";
+import LegalPage from "./pages/LegalPage";
 
 export default function App() {
   return (
@@ -27,6 +28,9 @@ export default function App() {
           <Route path="resources" element={<ResourcesPage />} />
           <Route path="about" element={<AboutPage />} />
           <Route path="contact" element={<ContactPage />} />
+          <Route path="privacy" element={<LegalPage page="privacy" />} />
+          <Route path="cookies" element={<LegalPage page="cookies" />} />
+          <Route path="terms" element={<LegalPage page="terms" />} />
           <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>
